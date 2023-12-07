@@ -16,6 +16,10 @@ To run the application, follow the below instructions.
     ```bash
     cd VulnerableBlazorApp
     ```
+- Run the database migrations
+    ```bash
+    dotnet ef database update
+    ```
 - Start the application
     ```bash
     dotnet watch
