@@ -1,0 +1,73 @@
+@page "/image-preview"
+@inject NavigationManager Navigation
+
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Image Preview</PageTitle>
+
+<h1>This is a safe picture.</h1>
+
+<img src="images/hardhat.jpg" class="img-fluid" alt="Protective equipment" />
+
+@if (ImageSource is not null)
+{
+<img src="@ImageSource" />
+}
+
+@code {
+    public string? ImageSource { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? UnvalidatedFileName { get; set; }
+    
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? AllowlistedFileName { get; set; }
+    
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? FileName { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (UnvalidatedFileName is not null)
+        {
+            ImageSource = DangerouslyFetchDataURLFromFilename(UnvalidatedFileName);
+        }
+        else if (AllowlistedFileName is not null)
+        {
+            ImageSource = FetchAllowlistedDataURLFromFileName(AllowlistedFileName);
+        }
+        else if (FileName is not null)
+        {
+            ImageSource = FetchValidatedDataURLFromFileName(FileName);
+        }
+    }
+
+    private string DangerouslyFetchDataURLFromFilename(string fileName)
+    {
+        return FetchImageDataURLFromPath(Path.Combine([System.IO.Directory.GetCurrentDirectory(), "wwwroot", "images", fileName]));
+    }
+
+    private string FetchAllowlistedDataURLFromFileName(string fileName)
+    {
+        string[] allowedFiles = ["hardhat.jpg"];
+        return allowedFiles.Contains(fileName) ? FetchImageDataURLFromPath(Path.Combine([System.IO.Directory.GetCurrentDirectory(), "wwwroot", "images", fileName])) : "";    }
+
+    private string FetchValidatedDataURLFromFileName(string fileName)
+    {
+        var sanitizedFileName = Path.GetFileName(fileName);
+        var expectedPath = Path.Combine([System.IO.Directory.GetCurrentDirectory(), "wwwroot", "images"]);
+        var expectedExtension = ".jpg";
+        var fullPath = Path.Combine(expectedPath, sanitizedFileName);
+        return Path.GetDirectoryName(fullPath) == expectedPath && Path.GetExtension(fullPath) == expectedExtension ? FetchImageDataURLFromPath(fullPath) : "";
+    }
+
+    private string FetchImageDataURLFromPath(string path)
+    {
+        byte[] fileBytes = System.IO.File.ReadAllBytes(path);
+        string base64EncodedData = Convert.ToBase64String(fileBytes);
+        return string.Format("data:image/png;base64,{0}", base64EncodedData);
+    }
+}
