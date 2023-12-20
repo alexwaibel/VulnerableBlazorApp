@@ -16,6 +16,10 @@ To run the application, follow the below instructions.
     ```bash
     cd VulnerableBlazorApp
     ```
+- Install dotnet entity framework
+    ```bash
+    dotnet tool install --global dotnet-ef
+    ```
 - Run the database migrations
     ```bash
     dotnet ef database update
