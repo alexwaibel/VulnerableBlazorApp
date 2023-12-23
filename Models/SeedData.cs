@@ -23,7 +23,7 @@ public static class SeedData
                 return;   // DB has been seeded
             }
 
-            string ADMIN_ID = Guid.NewGuid().ToString();
+            string ADMIN_USER_ID = Guid.NewGuid().ToString();
             string ADMIN_ROLE_ID = Guid.NewGuid().ToString();
 
             context.Roles.AddRange(
@@ -39,7 +39,7 @@ public static class SeedData
 
             var adminUser = new ApplicationUser
             {
-                Id = ADMIN_ID,
+                Id = ADMIN_USER_ID,
                 Email = "test@example.com",
                 EmailConfirmed = true,
                 NormalizedEmail = "TEST@EXAMPLE.COM",
@@ -51,6 +51,15 @@ public static class SeedData
             context.Users.AddRange(
                 adminUser
             );
+
+            context.UserRoles.AddRange(
+                new IdentityUserRole<string>
+                {
+                    RoleId = ADMIN_ROLE_ID,
+                    UserId = ADMIN_USER_ID
+                }
+            );
+
             context.SaveChanges();
         }
     }
